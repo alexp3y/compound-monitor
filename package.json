@@ -3,6 +3,13 @@
   "version": "1.0.0",
   "description": "AWS Lambda function monitoring Compound finance utilization",
   "main": "index.js",
+  "scripts": {
+    "package": "7z a ./bin/deploy.zip index.js node_modules/",
+    "deploy-local": "awslocal lambda update-function-code --function-name compound-monitor --zip-file fileb://bin/deploy.zip",
+    "invoke-local": "awslocal lambda invoke --function-name compound-monitor out --log-type Tail",
+    "deploy": "aws --profile amp lambda update-function-code --function-name compound-monitor --zip-file fileb://bin/deploy.zip",
+    "invoke": "aws --profile amp lambda invoke --function-name compound-monitor out --log-type Tail"
+  },
   "author": "alexp3y@gmail.com",
   "license": "ISC",
   "dependencies": {

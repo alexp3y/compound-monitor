@@ -1,8 +1,9 @@
+'use strict';
 require('dotenv').config();
 const axios = require('axios');
 const nodemailer = require('nodemailer');
 
-const handler = async () => {
+const handler = async (event, context, callback) => {
   try {
     // validate env
     const walletAddress = process.env.WALLET_ADDRESS;
@@ -15,7 +16,7 @@ const handler = async () => {
     }
     // query Compound API
     let response = await axios.get(
-      `https://api.compound.finance/api/v2/account?addresses=${process.env.WALLET_ADDRESS}`
+      `http://api.compound.finance/api/v2/account?addresses=${process.env.WALLET_ADDRESS}`
     );
     // ensure account accuracy
     const account = response.data.accounts[0];
@@ -32,7 +33,8 @@ const handler = async () => {
     if (utilization < alertThreshold) {
       console.log(`Utilization Okay: ${utilization}%`);
     } else {
-      sendAlertMail(utilization);
+      console.log('Sending Mail....');
+      return sendAlertMail(utilization);
     }
   } catch (err) {
     console.error(JSON.stringify(err));
@@ -40,14 +42,14 @@ const handler = async () => {
 };
 
 const sendAlertMail = (utilization) => {
-  var transporter = nodemailer.createTransport({
+  let transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
       user: process.env.GMAIL_USER,
       pass: process.env.GMAIL_PW,
     },
   });
-  var mailOptions = {
+  let mailOptions = {
     from: process.env.GMAIL_USER,
     to: process.env.GMAIL_USER,
     subject: '!!COMPOUND ALERT!!',
@@ -56,13 +58,19 @@ const sendAlertMail = (utilization) => {
       priority: 'high',
     },
   };
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error);
-    } else {
-      console.log('Email sent: ' + info.response);
-    }
+  return new Promise(function (resolve, reject) {
+    transporter.sendMail(mailOptions, function (error, info) {
+      if (error) {
+        console.log(error);
+        reject(error);
+      } else {
+        console.log('Email sent: ' + info.response);
+        resolve(info);
+      }
+    });
   });
 };
+
+exports.handler = handler;
 
 handler();
