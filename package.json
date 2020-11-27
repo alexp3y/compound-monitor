@@ -1,0 +1,13 @@
+{
+  "name": "compound-monitor",
+  "version": "1.0.0",
+  "description": "AWS Lambda function monitoring Compound finance utilization",
+  "main": "index.js",
+  "author": "alexp3y@gmail.com",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^0.21.0",
+    "dotenv": "^8.2.0",
+    "nodemailer": "^6.4.16"
+  }
+}
