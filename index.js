@@ -72,5 +72,3 @@ const sendAlertMail = (utilization) => {
 };
 
 exports.handler = handler;
-
-handler();
