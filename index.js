@@ -1,7 +1,8 @@
 'use strict';
 require('dotenv').config();
 const axios = require('axios');
-const nodemailer = require('nodemailer');
+const aws = require('aws-sdk');
+const ses = new aws.SES({ region: 'us-east-1' });
 
 const handler = async (event, context, callback) => {
   try {
@@ -42,33 +43,21 @@ const handler = async (event, context, callback) => {
 };
 
 const sendAlertMail = (utilization) => {
-  let transporter = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: process.env.GMAIL_USER,
-      pass: process.env.GMAIL_PW,
+  let params = {
+    Destination: {
+      ToAddresses: [process.env.GMAIL_USER],
     },
-  });
-  let mailOptions = {
-    from: process.env.GMAIL_USER,
-    to: process.env.GMAIL_USER,
-    subject: '!!COMPOUND ALERT!!',
-    text: `UTILIZATION: ${utilization}%`,
-    headers: {
-      priority: 'high',
+    Message: {
+      Body: {
+        Text: {
+          Data: `UTILIZATION: ${utilization}%`,
+        },
+      },
+      Subject: { Data: '!!COMPOUND ALERT!!' },
     },
+    Source: process.env.GMAIL_USER,
   };
-  return new Promise(function (resolve, reject) {
-    transporter.sendMail(mailOptions, function (error, info) {
-      if (error) {
-        console.log(error);
-        reject(error);
-      } else {
-        console.log('Email sent: ' + info.response);
-        resolve(info);
-      }
-    });
-  });
+  return ses.sendEmail(params).promise();
 };
 
 exports.handler = handler;

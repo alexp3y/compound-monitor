@@ -11,10 +11,9 @@
     "invoke": "aws --profile amp lambda invoke --function-name compound-monitor out --log-type Tail"
   },
   "author": "alexp3y@gmail.com",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.21.0",
-    "dotenv": "^8.2.0",
-    "nodemailer": "^6.4.16"
+    "dotenv": "^8.2.0"
   }
 }
